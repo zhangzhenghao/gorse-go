@@ -76,7 +76,7 @@ func (c *GorseClient) GetLatestItems(ctx context.Context, userId string, categor
 }
 
 func (c *GorseClient) GetNonPersonalized(ctx context.Context, name string, category string, n int, offset int, userId string) ([]Score, error) {
-	path := fmt.Sprintf("/api/non-personalized/%s?n=%d&offset=%d&user-id=\"%s\"", name, n, offset, userId)
+	path := fmt.Sprintf("/api/non-personalized/%s?n=%d&offset=%d&user-id=%s", name, n, offset, userId)
 	if category != "" {
 		path += fmt.Sprintf("&category=%s", category)
 	}
@@ -84,7 +84,7 @@ func (c *GorseClient) GetNonPersonalized(ctx context.Context, name string, categ
 }
 
 func (c *GorseClient) GetCollaborativeFiltering(ctx context.Context, userId string, category string, n int, offset int) ([]Score, error) {
-	path := fmt.Sprintf("/api/collaborative-filtering/%s?n=%d&offset=%d&user-id=\"%s\"", userId, n, offset, userId)
+	path := fmt.Sprintf("/api/collaborative-filtering/%s?n=%d&offset=%d&user-id=%s", userId, n, offset, userId)
 	if category != "" {
 		path += fmt.Sprintf("&category=%s", category)
 	}
