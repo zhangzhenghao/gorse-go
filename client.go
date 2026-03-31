@@ -56,15 +56,9 @@ func (c *GorseClient) DeleteFeedbacks(ctx context.Context, userId, itemId string
 	return request[RowAffected, any](ctx, c, "DELETE", c.entryPoint+fmt.Sprintf("/api/feedback/%s/%s", userId, itemId), nil)
 }
 
-// GetRecommend returns recommended items for a user.
-// Deprecated: Use GetRecommendWithScores instead to get recommendation scores.
-func (c *GorseClient) GetRecommend(ctx context.Context, userId string, category string, n, offset int) ([]string, error) {
-	return request[[]string, any](ctx, c, "GET", c.entryPoint+fmt.Sprintf("/api/recommend/%s/%s?n=%d&offset=%v", userId, category, n, offset), nil)
-}
-
-// GetRecommendWithScores returns recommended items with scores for a user.
-// This uses X-API-Version: 2 header to get scores.
-func (c *GorseClient) GetRecommendWithScores(ctx context.Context, userId string, category string, n, offset int) ([]Score, error) {
+// GetRecommend returns recommended items with scores for a user.
+// Uses X-API-Version: 2 header to return scores.
+func (c *GorseClient) GetRecommend(ctx context.Context, userId string, category string, n, offset int) ([]Score, error) {
 	url := c.entryPoint + fmt.Sprintf("/api/recommend/%s/%s?n=%d&offset=%v", userId, category, n, offset)
 	return requestWithHeaders[[]Score, any](ctx, c, "GET", url, nil, map[string]string{"X-API-Version": "2"})
 }
@@ -98,12 +92,6 @@ func (c *GorseClient) GetCollaborativeFiltering(ctx context.Context, userId stri
 		path += fmt.Sprintf("&category=%s", category)
 	}
 	return request[[]Score, any](ctx, c, "GET", c.entryPoint+path, nil)
-}
-
-// GetRecommendOffSet returns recommended items for a user with offset.
-// Deprecated: Use GetRecommendWithScores instead to get recommendation scores.
-func (c *GorseClient) GetRecommendOffSet(ctx context.Context, userId string, category string, n, offset int) ([]string, error) {
-	return request[[]string, any](ctx, c, "GET", c.entryPoint+fmt.Sprintf("/api/recommend/%s/%s?n=%d&offset=%v", userId, category, n, offset), nil)
 }
 
 func (c *GorseClient) SessionRecommend(ctx context.Context, feedbacks []Feedback, n int) ([]Score, error) {
