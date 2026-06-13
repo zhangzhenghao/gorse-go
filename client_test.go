@@ -16,6 +16,8 @@ package client
 
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -155,6 +157,41 @@ func (suite *GorseClientTestSuite) TestItems() {
 	suite.Equal(1, deleteAffect.RowAffected)
 	_, err = suite.client.GetItem(ctx, "2000")
 	suite.Equal("2000: item not found", err.Error())
+}
+
+func TestGorseClientSearchItemsRequest(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Fatalf("expected GET request, got %s", r.Method)
+		}
+		if r.URL.Path != "/api/items" {
+			t.Fatalf("expected /api/items path, got %s", r.URL.Path)
+		}
+		if r.URL.Query().Get("q") != "matrix reloaded" {
+			t.Fatalf("expected query matrix reloaded, got %s", r.URL.Query().Get("q"))
+		}
+		if r.URL.Query().Get("n") != "2" {
+			t.Fatalf("expected n=2, got %s", r.URL.Query().Get("n"))
+		}
+		if r.Header.Get("X-API-Key") != "secret" {
+			t.Fatalf("expected X-API-Key secret, got %s", r.Header.Get("X-API-Key"))
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"Items":[{"ItemId":"1","Comment":"The Matrix Reloaded"}]}`))
+	}))
+	defer server.Close()
+
+	gorse := NewGorseClient(server.URL, "secret")
+	items, err := gorse.SearchItems(context.Background(), "matrix reloaded", 2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(items.Items) != 1 {
+		t.Fatalf("expected 1 item, got %d", len(items.Items))
+	}
+	if items.Items[0].ItemId != "1" || items.Items[0].Comment != "The Matrix Reloaded" {
+		t.Fatalf("unexpected item: %+v", items.Items[0])
+	}
 }
 
 func (suite *GorseClientTestSuite) TestFeedback() {
