@@ -157,6 +157,16 @@ func (suite *GorseClientTestSuite) TestItems() {
 	suite.Equal("2000: item not found", err.Error())
 }
 
+func (suite *GorseClientTestSuite) TestSearchItems() {
+	ctx := context.Background()
+	items, err := suite.client.SearchItems(ctx, "Toy Story", 3)
+	suite.NoError(err)
+	if suite.NotEmpty(items.Items) {
+		suite.Equal("1", items.Items[0].ItemId)
+		suite.Equal("Toy Story (1995)", items.Items[0].Comment)
+	}
+}
+
 func (suite *GorseClientTestSuite) TestFeedback() {
 	ctx := context.Background()
 	_, err := suite.client.InsertUser(ctx, User{UserId: "2000"})

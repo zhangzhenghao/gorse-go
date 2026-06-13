@@ -21,6 +21,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -155,6 +156,10 @@ func (c *GorseClient) GetItem(ctx context.Context, itemId string) (Item, error) 
 
 func (c *GorseClient) GetItems(ctx context.Context, n int, cursor string) (ItemIterator, error) {
 	return request[ItemIterator, any](ctx, c, "GET", c.entryPoint+fmt.Sprintf("/api/items?n=%d&cursor=%s", n, cursor), nil)
+}
+
+func (c *GorseClient) SearchItems(ctx context.Context, query string, n int) (ItemIterator, error) {
+	return request[ItemIterator, any](ctx, c, "GET", c.entryPoint+fmt.Sprintf("/api/items?q=%s&n=%d", url.QueryEscape(query), n), nil)
 }
 
 func (c *GorseClient) DeleteItem(ctx context.Context, itemId string) (RowAffected, error) {
