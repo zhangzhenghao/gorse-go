@@ -249,6 +249,31 @@ func (suite *GorseClientTestSuite) TestRecommend() {
 	}
 }
 
+func (suite *GorseClientTestSuite) TestRecommendMultipleCategories() {
+	ctx := context.Background()
+	_, err := suite.client.InsertUser(ctx, User{UserId: "4000"})
+	suite.NoError(err)
+	recommendations, err := suite.client.GetRecommendWithOptions(ctx, "4000", RecommendOptions{
+		Categories:     []string{"Drama", "Comedy"},
+		WriteBackType:  "recommend",
+		WriteBackDelay: "1h",
+		N:              3,
+		Offset:         0,
+	})
+	suite.NoError(err)
+	if suite.Len(recommendations, 3) {
+		for _, recommendation := range recommendations {
+			item, err := suite.client.GetItem(ctx, recommendation.Id)
+			suite.NoError(err)
+			matched := false
+			for _, category := range item.Categories {
+				matched = matched || category == "Drama" || category == "Comedy"
+			}
+			suite.True(matched)
+		}
+	}
+}
+
 func TestGorseClientTestSuite(t *testing.T) {
 	suite.Run(t, new(GorseClientTestSuite))
 }
