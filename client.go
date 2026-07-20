@@ -67,20 +67,7 @@ func (c *GorseClient) DeleteFeedbacks(ctx context.Context, userId, itemId string
 
 // GetRecommend returns recommended items with scores for a user.
 // Uses X-API-Version: 2 header to return scores.
-func (c *GorseClient) GetRecommend(ctx context.Context, userId string, category string, n, offset int) ([]Score, error) {
-	var categories []string
-	if category != "" {
-		categories = []string{category}
-	}
-	return c.GetRecommendWithOptions(ctx, userId, RecommendOptions{
-		Categories: categories,
-		N:          n,
-		Offset:     offset,
-	})
-}
-
-// GetRecommendWithOptions returns recommended items with scores for a user.
-func (c *GorseClient) GetRecommendWithOptions(ctx context.Context, userId string, options RecommendOptions) ([]Score, error) {
+func (c *GorseClient) GetRecommend(ctx context.Context, userId string, options RecommendOptions) ([]Score, error) {
 	query := url.Values{}
 	for _, category := range options.Categories {
 		if category != "" {

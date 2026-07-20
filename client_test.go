@@ -239,7 +239,7 @@ func (suite *GorseClientTestSuite) TestRecommend() {
 	ctx := context.Background()
 	_, err := suite.client.InsertUser(ctx, User{UserId: "3000"})
 	suite.NoError(err)
-	recommendations, err := suite.client.GetRecommend(ctx, "3000", "", 3, 0)
+	recommendations, err := suite.client.GetRecommend(ctx, "3000", RecommendOptions{N: 3})
 	suite.NoError(err)
 	suite.Len(recommendations, 3)
 	if suite.Len(recommendations, 3) {
@@ -253,7 +253,7 @@ func (suite *GorseClientTestSuite) TestRecommendMultipleCategories() {
 	ctx := context.Background()
 	_, err := suite.client.InsertUser(ctx, User{UserId: "4000"})
 	suite.NoError(err)
-	recommendations, err := suite.client.GetRecommendWithOptions(ctx, "4000", RecommendOptions{
+	recommendations, err := suite.client.GetRecommend(ctx, "4000", RecommendOptions{
 		Categories:     []string{"Drama", "Comedy"},
 		WriteBackType:  "recommend",
 		WriteBackDelay: "1h",
